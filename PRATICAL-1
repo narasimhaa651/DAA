@@ -1,0 +1,136 @@
+import time
+import random
+
+# ==========================================
+# 1. BUBBLE SORT
+# ==========================================
+def bubble_sort(arr):
+    n = len(arr)
+    for i in range(n):
+        swapped = False
+        for j in range(0, n - i - 1):
+            if arr[j] > arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+                swapped = True
+        if not swapped:  # Early exit optimization for sorted arrays
+            break
+    return arr
+
+# ==========================================
+# 2. SELECTION SORT
+# ==========================================
+def selection_sort(arr):
+    n = len(arr)
+    for i in range(n):
+        min_idx = i
+        for j in range(i + 1, n):
+            if arr[j] < arr[min_idx]:
+                min_idx = j
+        arr[i], arr[min_idx] = arr[min_idx], arr[i]
+    return arr
+
+# ==========================================
+# 3. INSERTION SORT
+# ==========================================
+def insertion_sort(arr):
+    for i in range(1, len(arr)):
+        key = arr[i]
+        j = i - 1
+        while j >= 0 and key < arr[j]:
+            arr[j + 1] = arr[j]
+            j -= 1
+        arr[j + 1] = key
+    return arr
+
+# ==========================================
+# 4. MERGE SORT
+# ==========================================
+def merge_sort(arr):
+    if len(arr) <= 1:
+        return arr
+        
+    mid = len(arr) // 2
+    left = merge_sort(arr[:mid])
+    right = merge_sort(arr[mid:])
+    
+    return merge(left, right)
+
+def merge(left, right):
+    result = []
+    i = j = 0
+    while i < len(left) and j < len(right):
+        if left[i] < right[j]:
+            result.append(left[i])
+            i += 1
+        else:
+            result.append(right[j])
+            j += 1
+    result.extend(left[i:])
+    result.extend(right[j:])
+    return result
+
+# ==========================================
+# 5. QUICK SORT
+# ==========================================
+def quick_sort(arr):
+    if len(arr) <= 1:
+        return arr
+    pivot = arr[len(arr) // 2]
+    left = [x for x in arr if x < pivot]
+    middle = [x for x in arr if x == pivot]
+    right = [x for x in arr if x > pivot]
+    return quick_sort(left) + middle + quick_sort(right)
+
+# ==========================================
+# 6. ALL SORT (Python's Built-in Timsort)
+# ==========================================
+def built_in_sort(arr):
+    return sorted(arr)
+
+# ==========================================
+# DRIVER ENGINE & PERFORMANCE BENCHMARK
+# ==========================================
+if __name__ == "__main__":
+    # Small scale functional verification
+    sample = [64, 34, 25, 12, 22, 11, 90]
+    print("--- Functional Verification ---")
+    print(f"Original Array: {sample}\n")
+    print(f"Bubble Sort:    {bubble_sort(sample.copy())}")
+    print(f"Selection Sort: {selection_sort(sample.copy())}")
+    print(f"Insertion Sort: {insertion_sort(sample.copy())}")
+    print(f"Merge Sort:     {merge_sort(sample.copy())}")
+    print(f"Quick Sort:     {quick_sort(sample.copy())}")
+    print(f"Built-in Sort:  {built_in_sort(sample.copy())}")
+    print("-" * 40)
+
+    # Large scale benchmarking execution
+    print("\n--- Real Execution Benchmarking (1000 Elements) ---")
+    large_dataset = [random.randint(1, 10000) for _ in range(1000)]
+    
+    algorithms = {
+        "Bubble Sort": bubble_sort,
+        "Selection Sort": selection_sort,
+        "Insertion Sort": insertion_sort,
+        "Merge Sort": merge_sort,
+        "Quick Sort": quick_sort,
+        "Built-in Sort (Timsort)": built_in_sort
+    }
+    
+    for name, func in algorithms.items():
+        data_copy = large_dataset.copy()
+        start_time = time.perf_counter()
+        func(data_copy)
+        end_time = time.perf_counter()
+        execution_time = (end_time - start_time) * 1000 # Convert to milliseconds
+        print(f"⏱️ {name:<25}: {execution_time:>8.2f} ms")
+🗒️ Executive Summary
+Sorting algorithms are fundamental tools in computer science designed to organize data systematically. They fall into two main engineering tiers based on how their execution scales with data volume (n):
+Quadratic Algorithms (O(n²)): Bubble Sort, Selection Sort, and Insertion Sort rely on nested loops. They are simple to write and use minimal memory (O(1) space), but their performance drops significantly as the dataset grows. Among these, Insertion Sort is the most efficient for small or nearly sorted arrays.Logarithmic Algorithms (\(O(n \log n)\)): Merge Sort, Quick Sort, and Python's built-in Timsort use divide-and-conquer strategies. They scale exceptionally well to massive datasets, processing millions of items in a fraction of a second.
+Conclusion & Selection Guide
+There is no single "best" sorting algorithm; the optimal choice depends entirely on your system constraints, memory limits, and data structure:
+*Use Built-In Methods (Timsort) for Production: In real-world Python development, always default to list.sort() or sorted(). Timsort dynamically adapts to existing order in your data, outperforming raw manual implementations while maintaining stability.
+*Use Merge Sort when Stability Matters: If you must preserve the original order of items with identical 
+(like sorting transactions by date, then by amount), Merge Sort is highly reliable. However, you must have enough memory to handle its O(n) space requireme
+*Use Quick Sort for In-Memory Speed: If memory is limited and absolute stability isn't required, an in-place Quick Sort is highly efficient because it eliminates the overhead of copying subarrays.
+*Use Insertion Sort for Small/Streaming Data: If you are working with hardware constraints, tiny arrays (n < 50), or a live data stream where numbers arrive one by one, Insertion Sort is fast, predictable, and memory-efficient.
+*Avoid Bubble and Selection Sort in Production: These algorithms should be restricted to academic learning and conceptual design. Their high operation count makes them highly inefficient for modern application scale.
